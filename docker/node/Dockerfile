@@ -1,12 +1,22 @@
 FROM node:10.15.0-alpine
 
-RUN apk add npm && npm i -g http-server && apk add --no-cache bash
+# create destination directory
+RUN mkdir -p /usr/src/nuxt-app
+WORKDIR /usr/src/nuxt-app
 
-VOLUME /app
+# update and install dependency
+RUN apk update && apk upgrade
 
-WORKDIR /app
+# copy the app, note .dockerignore
+COPY . /usr/src/nuxt-app/
+RUN npm install && npm run build
 
 EXPOSE 3000
 
-CMD http-server
+## set app serving to permissive / assigned
+ENV NUXT_HOST=0.0.0.0
+## set app port
+#ENV NUXT_PORT=3000
 
+# start the app
+CMD [ "npm", "start" ]
